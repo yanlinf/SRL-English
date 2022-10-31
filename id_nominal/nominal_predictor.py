@@ -13,6 +13,7 @@ from allennlp.data.tokenizers.word_splitter import SpacyWordSplitter
 
 from id_nominal.nombank_reader import separate_hyphens
 
+
 @Predictor.register("nombank-id")
 class NominalIdPredictor(Predictor):
     """
@@ -20,8 +21,8 @@ class NominalIdPredictor(Predictor):
     """
 
     def __init__(
-            self, model: Model, dataset_reader: DatasetReader, language: str="en_core_web_sm"
-            ) -> None:
+            self, model: Model, dataset_reader: DatasetReader, language: str = "en_core_web_sm"
+    ) -> None:
         super().__init__(model, dataset_reader)
         self._tokenizer = SpacyWordSplitter(language=language, pos_tags=True)
 
@@ -59,16 +60,16 @@ class NominalIdPredictor(Predictor):
         """
         spacy_doc = Doc(self._tokenizer.spacy.vocab, words=tokenized_sentence)
         for pipe in filter(None, self._tokenizer.spacy.pipeline):
-            pipe[1](spacy_doc) 
+            pipe[1](spacy_doc)
 
         tokens = [token for token in spacy_doc]
         instances = self.tokens_to_instances(tokens)
 
         if not instances:
             return sanitize({"nominals": [], "words": tokens})
-        
+
         return self.predict_instances(instances)
-    
+
     @overrides
     def _json_to_instance(self, json_dict: JsonDict):
         raise NotImplementedError("The SRL mdel uses a different API for creating instances.")
@@ -119,27 +120,27 @@ class NominalIdPredictor(Predictor):
         instances_per_sentence = [self._sentence_to_srl_instances(json) for json in inputs]
 
         flattened_instances = [
-                instance
-                for sentence_instances in instances_per_sentence
-                for instance in sentence_instances
+            sentence_instances[0]
+            for sentence_instances in instances_per_sentence
         ]
 
         if not flattened_instances:
             return sanitize(
-                    [{"nominals": [], "words": self._tokenizer.split_words(x["sentence"])} for x in inputs]
-                    )
+                [{"nominals": [], "words": self._tokenizer.split_words(x["sentence"])} for x in inputs]
+            )
 
         # Batch instances and check last batch for padded elements if number of instances
         # is not a perfect multiple of the batch size.
         batched_instances = group_by_count(flattened_instances, batch_size, None)
         batched_instances[-1] = [
-                instance for instance in batched_instances[-1] if instance is not None
-                ]
+            instance for instance in batched_instances[-1] if instance is not None
+        ]
         outputs: List[Dict[str, numpy.ndarray]] = []
         for batch in batched_instances:
             outputs.extend(self._model.forward_on_instances(batch))
-        
-        return_dicts: List[JsonDict] = [{"words": output["words"] ,"nominals": output["predicate_indicator"]} for output in outputs]
+
+        return_dicts: List[JsonDict] = [{"words": output["words"], "nominals": output["predicate_indicator"]} for output
+                                        in outputs]
 
         return sanitize(return_dicts)
 
@@ -162,4 +163,4 @@ class NominalIdPredictor(Predictor):
         if not instances:
             return sanitize({"nominals": [], "words": self._tokenizer.split_words(inputs["sentence"])})
 
-        return self.predict_instances(instances)
+        return self.predict_instances(instances[:1])
