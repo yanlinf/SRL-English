@@ -4,6 +4,9 @@ from typing import List
 
 
 class NomSRLPredictor:
+    """
+    A predictor that integrates "nombank-id" and "nombank-sense-srl"
+    """
     default_nom_id_model_path = 'nom-id-bert/model.tar.gz'
     default_nom_sense_srl_model_path = 'nom-sense-srl/model.tar.gz'
 
