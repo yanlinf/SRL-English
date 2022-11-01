@@ -46,9 +46,8 @@ class NomSRLPredictor:
         assert len(nom_srl_inputs) == len(inputs)
 
         nom_srl_res = self.nom_srl_predictor.predict_batch_json(nom_srl_inputs)
-        assert len(nom_srl_res) == len(inputs) \
-               and all(isinstance(d, dict) for d in nom_srl_res) \
-               and all(d1['words'] == d2['words'] for d1, d2 in zip(nom_id_res, nom_srl_res))
+        assert len(nom_srl_res) == len(inputs)
+        assert all(isinstance(d, dict) for d in nom_srl_res)
 
         return nom_srl_res
 
@@ -82,6 +81,7 @@ class NomSRLPredictor:
 
 def main():
     inputs = [
+        {'sentence': '----- The crash of two- --airplane resulted in the----crash of two airplanes.'},
         {'sentence': 'The crash of two airplanes resulted in the crash of two airplanes.'},
         {'sentence': 'The sentence of the criminal was made yesterday.'},
         {'sentence': 'As part of the 11-billion-dollar sale of USA Interactive\'s film'
