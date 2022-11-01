@@ -178,7 +178,7 @@ class NounSemanticRoleLabelerPredictor(Predictor):
         for sentence_index, nom_count in enumerate(noms_per_sentence):
             if nom_count == 0:
                 # If sentence has no nominals, just return the tokenization.
-                original_text = sef._tokenizer.split_words(inputs[sentence_index]["sentence"])
+                original_text = self._tokenizer.split_words(inputs[sentence_index]["sentence"])
 
                 return_dicts[sentence_index]["words"] = original_text
                 continue
