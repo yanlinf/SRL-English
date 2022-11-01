@@ -84,12 +84,16 @@ def main():
     inputs = [
         {'sentence': 'The crash of two airplanes resulted in the crash of two airplanes.'},
         {'sentence': 'The sentence of the criminal was made yesterday.'},
+        {'sentence': 'As part of the 11-billion-dollar sale of USA Interactive\'s film'
+                     ' and television operations to the French company and its parent'
+                     ' company in December 2001, USA Interactive received 2.5 billion'
+                     ' dollars in preferred shares in Vivendi Universal Entertainment.'},
     ]
     predictor = NomSRLPredictor.from_path()
     res = predictor.predict_batch_json(inputs)
     print(res)
     print()
-    res = predictor.predict(inputs[0]['sentence'])
+    res = predictor.predict(inputs[-1]['sentence'])
     print(res)
 
 
